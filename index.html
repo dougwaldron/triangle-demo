@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Triangle fractal generator</title>
+    <style>
+        body {
+            margin: 20px;
+            overflow: hidden;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas class="myCanvas"></canvas>
+
+    <script>
+        // Define the canvas
+        const canvas = document.querySelector('.myCanvas');
+        canvas.width = window.innerWidth - 40;
+        canvas.height = window.innerHeight - 40;
+        const ctx = canvas.getContext('2d');
+
+        // Set the triangle size within the browser window
+        const margin = 5;
+        const maxHeight = canvas.height - margin * 2;
+        const maxWidth = canvas.width - margin * 2;
+        const ratio = 3 ** 0.5 / 2;
+        const base = Math.min(maxHeight / ratio, maxWidth);
+        const height = base * ratio;
+
+        // Define the triangle's vertices
+        const pointAx = canvas.width / 2;
+        const pointAy = margin;
+        const pointBx = pointAx - (base / 2);
+        const pointBy = height - margin;
+        const pointCx = pointAx + (base / 2);
+        const pointCy = height - margin;
+
+        ctx.fillStyle = 'darkred';
+        drawAPoint(pointAx, pointAy, 5);
+        drawAPoint(pointBx, pointBy, 5);
+        drawAPoint(pointCx, pointCy, 5);
+
+        // Choose a random starting point
+        let x = Math.floor(Math.random() * maxWidth) + margin;
+        let y = Math.floor(Math.random() * maxHeight) + margin;
+
+        ctx.fillStyle = 'darkgreen';
+        drawAPoint(x, y, 4);
+
+        // Set the drawing style
+        ctx.fillStyle = 'black';
+        const minPoints = 30000;
+        const delay = 600;
+
+        // Start drawing points
+        let j = 1;
+        let totalPoints = 0;
+        drawPoints(j);
+
+        function drawPoints(j) {
+            let iterations = Math.floor(2 ** j * 10);
+
+            for (let i = 0; i < iterations; i++) {
+                // Choose a random vertex to move toward
+                const random = Math.floor(Math.random() * 3);
+
+                // Move the point halfway to the chosen vertex
+                if (random === 0) {
+                    x = (pointAx + x) / 2;
+                    y = (pointAy + y) / 2;
+                } else if (random === 1) {
+                    x = (pointBx + x) / 2;
+                    y = (pointBy + y) / 2;
+                } else {
+                    x = (pointCx + x) / 2;
+                    y = (pointCy + y) / 2;
+                }
+
+                drawAPoint(x, y);
+            }
+
+            // Keep going until we've reached the minimum number of points
+            totalPoints += iterations;
+            console.log(`Current iterations: ${iterations}; Total points: ${totalPoints}`);
+            if (totalPoints < minPoints) {
+                j++;
+                setTimeout(drawPoints, delay, j);
+            }
+        }
+
+        function drawAPoint(x, y, size = 1) {
+            ctx.beginPath();
+            ctx.arc(x, y, size, 0, 2 * Math.PI, false);
+            ctx.fill();
+        }
+    </script>
+</body>
+
+</html>
